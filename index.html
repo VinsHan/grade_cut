@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>사바나 결정사: 연애 생태계 먹이사슬 판독기</title>
+    <style>
+        body { font-family: 'Noto Sans KR', sans-serif; background-color: #fce4ec; color: #333; display: flex; justify-content: center; min-height: 100vh; margin: 0; padding: 20px; }
+        .container { background-color: #fff; padding: 40px; border-radius: 20px; box-shadow: 0 15px 30px rgba(0,0,0,0.1); width: 100%; max-width: 650px; text-align: center; }
+        h1 { color: #d81b60; margin-bottom: 5px; font-size: 1.8em; }
+        p.subtitle { color: #666; margin-bottom: 25px; font-size: 0.9em; }
+        
+        .form-row { display: flex; gap: 15px; margin-bottom: 15px; }
+        .form-group { flex: 1; text-align: left; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #444; font-size: 0.9em; }
+        input[type="number"], select { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 1em; }
+        .radio-group { display: flex; gap: 15px; margin-top: 5px; padding: 10px 0; }
+        
+        button.analyze-btn { background-color: #d81b60; color: white; padding: 15px; border: none; border-radius: 10px; cursor: pointer; width: 100%; font-size: 1.2em; font-weight: bold; margin-top: 15px; transition: 0.2s; }
+        button.analyze-btn:hover { background-color: #ad1457; transform: translateY(-2px); }
+        
+        #resultArea { display: none; margin-top: 30px; animation: fadeIn 0.5s ease-in-out; }
+        
+        /* 먹이사슬 동물 테마 UI */
+        .animal-box { background: #fff0f5; border: 3px solid #f8bbd0; border-radius: 15px; padding: 25px; margin-bottom: 20px; }
+        .animal-emoji { font-size: 5em; margin: 10px 0; line-height: 1; }
+        .animal-title { font-size: 1.8em; font-weight: bold; color: #c2185b; margin-bottom: 10px; }
+        .rank-display { font-size: 1.2em; font-weight: bold; color: #880e4f; margin-bottom: 15px; }
+        
+        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; text-align: left; margin-bottom: 20px; }
+        .stat-item { background: #f5f5f5; padding: 10px; border-radius: 8px; font-size: 0.9em; border-left: 4px solid #d81b60; }
+        
+        .commentary { background-color: #fafafa; padding: 15px; border-radius: 8px; border-left: 5px solid #ff9800; text-align: left; font-size: 0.95em; line-height: 1.6; margin-bottom: 20px; }
+        
+        /* 추천 이성 프로필 */
+        .match-profile { border: 2px dashed #d81b60; padding: 20px; border-radius: 15px; background-color: #fff9fc; text-align: left; position: relative; }
+        .match-profile h3 { color: #d81b60; margin-top: 0; padding-bottom: 10px; border-bottom: 1px solid #f8bbd0; }
+        .match-profile .match-emoji { font-size: 2.5em; position: absolute; right: 20px; top: 15px; }
+        .match-specs { font-size: 0.95em; line-height: 1.6; color: #444; }
+        
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🌿 사바나 연애 생태계 판독기</h1>
+    <p class="subtitle">당신은 사자인가, 얼룩말인가, 아니면 쇠똥구리인가?</p>
+    
+    <div id="formArea">
+        <div class="form-group" style="margin-bottom: 15px;">
+            <label>1. 성별</label>
+            <div class="radio-group">
+                <label><input type="radio" name="gender" value="male" checked> 남성 ♂️</label>
+                <label><input type="radio" name="gender" value="female"> 여성 ♀️</label>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>2. 나이 (만)</label>
+                <input type="number" id="age" placeholder="예: 31">
+            </div>
+            <div class="form-group">
+                <label>3. 키 (cm) / 몸무게 (kg)</label>
+                <div style="display: flex; gap: 5px;">
+                    <input type="number" id="height" placeholder="175">
+                    <input type="number" id="weight" placeholder="70">
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 15px;">
+            <label>4. 현실적인 직업군</label>
+            <select id="job">
+                <option value="1">전문직 (의사/판검사/회계사) / 기업 오너 일가</option>
+                <option value="10">대기업 / 금융권 / 7급 공무원 / 교사</option>
+                <option value="25">건실한 중견기업 / 공기업 / 대학병원 간호사</option>
+                <option value="40">탄탄한 강소기업 / 매출 높은 안정적 자영업</option>
+                <option value="60">일반 중소기업 정규직 / 9급 공무원</option>
+                <option value="80">소상공인 (영세 자영업) / 프리랜서 / 계약직</option>
+                <option value="95">단기 아르바이트 / 무직 / 취업준비생</option>
+            </select>
+        </div>
+        
+        <div class="form-group" style="margin-bottom: 15px;">
+            <label>5. 최종 학력</label>
+            <select id="education">
+                <option value="2">의/치/한/약/수 또는 SKY</option>
+                <option value="10">서성한 / 중경외시 / 주요 지거국</option>
+                <option value="30">인서울 4년제 / 수도권 4년제</option>
+                <option value="60">지방 4년제</option>
+                <option value="85">전문대 / 고졸 이하</option>
+            </select>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>6. 연봉 (만원, 세전)</label>
+                <input type="number" id="income" placeholder="예: 4500">
+            </div>
+            <div class="form-group">
+                <label>7. 순자산 (만원, 대출제외)</label>
+                <input type="number" id="assets" placeholder="예: 10000">
+            </div>
+        </div>
+
+        <button class="analyze-btn" onclick="calculateRank()">초원 입장하기</button>
+    </div>
+
+    <div id="resultArea">
+        <div class="animal-box">
+            <div class="animal-title" id="animalTitle">당신의 생태계 지위는?</div>
+            <div class="animal-emoji" id="animalEmoji">🦁</div>
+            <div class="rank-display" id="rankDisplay">종합 상위 1%</div>
+            <p style="color:#666; font-size:0.9em;" id="animalDesc">결혼 생태계의 지배자입니다.</p>
+        </div>
+        
+        <div class="stat-grid" id="breakdownDisplay"></div>
+
+        <div class="commentary" id="commentaryDisplay"></div>
+
+        <div class="match-profile" id="matchProfile">
+            <h3>💞 당신에게 어울리는 짝 (동급 매칭)</h3>
+            <div class="match-emoji" id="matchEmoji">👫</div>
+            <div class="match-specs" id="matchSpecs"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function calculateRank() {
+        const gender = document.querySelector('input[name="gender"]:checked').value;
+        const age = parseInt(document.getElementById('age').value);
+        const jobPct = parseFloat(document.getElementById('job').value);
+        const eduPct = parseFloat(document.getElementById('education').value);
+        const height = parseFloat(document.getElementById('height').value);
+        const weight = parseFloat(document.getElementById('weight').value);
+        const income = parseFloat(document.getElementById('income').value);
+        const assets = parseFloat(document.getElementById('assets').value);
+
+        if(!age || !height || !weight || !income) { alert("빈칸 없이 모든 정보를 입력해야 초원에 입장할 수 있습니다."); return; }
+
+        // BMI 계산
+        const bmi = weight / ((height/100) * (height/100));
+        let bmiPct = 50;
+        if (gender === 'male') {
+            if (bmi < 23) bmiPct = 20; else if (bmi < 25) bmiPct = 40; else if (bmi < 28) bmiPct = 70; else bmiPct = 95;
+        } else {
+            if (bmi < 21) bmiPct = 5; else if (bmi < 23) bmiPct = 30; else if (bmi < 25) bmiPct = 75; else bmiPct = 95;
+        }
+
+        // 나이 계산
+        let agePct = 50;
+        if (gender === 'male') {
+            if(age <= 33) agePct = 10; else if(age <= 36) agePct = 35; else if(age <= 39) agePct = 70; else agePct = 95;
+        } else {
+            if(age <= 29) agePct = 5; else if(age <= 32) agePct = 25; else if(age <= 35) agePct = 65; else agePct = 95;
+        }
+
+        // 경제력 간략 계산
+        let incomePct = gender === 'male' ? Math.max(1, 100 - (income/80)) : Math.max(1, 100 - (income/50));
+        let assetsPct = Math.max(1, 100 - (assets/200));
+
+        // 종합 백분위 도출
+        let totalPct = 0;
+        if(gender === 'male') {
+            totalPct = (jobPct * 0.25) + (incomePct * 0.20) + (assetsPct * 0.15) + (agePct * 0.15) + (bmiPct * 0.15) + (eduPct * 0.10);
+        } else {
+            totalPct = (agePct * 0.35) + (bmiPct * 0.25) + (jobPct * 0.15) + (incomePct * 0.10) + (assetsPct * 0.10) + (eduPct * 0.05);
+        }
+        let finalRank = Math.max(0.1, Math.min(99.9, totalPct));
+
+        // UI 표시 전환
+        document.getElementById('formArea').style.display = 'none';
+        document.getElementById('resultArea').style.display = 'block';
+
+        // --- 사바나 먹이사슬 동물 판별 로직 ---
+        let animal = "", emoji = "", desc = "";
+        if (finalRank <= 5) {
+            animal = "수사자 / 암사자"; emoji = "🦁"; desc = "생태계 최상위 포식자. 사냥(소개팅)을 나가지 않아도 먹잇감이 알아서 줄을 섭니다. 그저 고르기만 하세요.";
+        } else if (finalRank <= 15) {
+            animal = "치타"; emoji = "🐆"; desc = "섹시하고 능력 있는 사냥꾼. 초원에서 가장 인기 있는 티어로, 원하는 상대는 언제든 낚아챌 수 있습니다.";
+        } else if (finalRank <= 40) {
+            animal = "기린"; emoji = "🦒"; desc = "안정적인 초식동물. 치열한 피바람을 피해 평화로운 가정을 꾸릴 수 있는 든든한 상위권입니다.";
+        } else if (finalRank <= 70) {
+            animal = "얼룩말"; emoji = "🦓"; desc = "초원에서 가장 흔히 볼 수 있는 평범한 존재입니다. 포식자들의 눈을 피해 비슷한 얼룩말끼리 뭉쳐 살아야 합니다.";
+        } else if (finalRank <= 90) {
+            animal = "미어캣"; emoji = "🦦"; desc = "척박한 현실. 소개팅 시장에서 이리저리 눈치를 보며 살아남기 위해 매일 발버둥 치는 중입니다.";
+        } else {
+            animal = "쇠똥구리"; emoji = "🪲"; desc = "연애는 사치입니다. 남들을 부러워할 시간 없이, 눈앞에 놓인 내 몫의 똥(현실)을 묵묵히 굴려야 합니다.";
+        }
+
+        document.getElementById('animalTitle').innerText = animal;
+        document.getElementById('animalEmoji').innerText = emoji;
+        document.getElementById('rankDisplay').innerText = `결혼 시장 종합 상위 ${finalRank.toFixed(1)}%`;
+        document.getElementById('animalDesc').innerText = desc;
+
+        // 세부 스탯 브리핑
+        document.getElementById('breakdownDisplay').innerHTML = `
+            <div class="stat-item">💼 <strong>직업:</strong> 상위 ${jobPct}% 구간</div>
+            <div class="stat-item">🎂 <strong>나이:</strong> ${age}세 (상위 ${agePct.toFixed(0)}%)</div>
+            <div class="stat-item">⚖️ <strong>체형:</strong> BMI ${(bmi).toFixed(1)}</div>
+            <div class="stat-item">💰 <strong>연봉:</strong> 상위 ${incomePct.toFixed(0)}% 구간</div>
+        `;
+
+        // 치명적 단점 분석
+        let worstStat = Math.max(agePct, bmiPct, jobPct, incomePct);
+        let comment = "<strong>[동물의 왕국 관찰 일지]</strong><br>";
+        if (worstStat > 70) {
+            if (worstStat === agePct) comment += "나이가 너무 많아 무리에서 도태될 위기입니다. 하루라도 빨리 짝을 찾아야 합니다.";
+            else if (worstStat === bmiPct) comment += "체중 관리에 실패하여 움직임이 둔합니다. 외모 가꾸기가 시급합니다.";
+            else if (worstStat === jobPct) comment += "직업/경제 기반이 흔들려 안정적인 둥지를 틀기 어렵습니다.";
+            else if (worstStat === incomePct) comment += "가져오는 먹이(연봉)가 너무 적어 짝짓기 시장에서 매력을 어필하기 힘듭니다.";
+        } else {
+            comment += "전반적인 밸런스가 좋습니다. 큰 약점이 없어 어디서든 무난하게 어울릴 수 있습니다.";
+        }
+        document.getElementById('commentaryDisplay').innerHTML = comment;
+
+        // --- 동급(또는 상위 10%) 이성 추천 로직 ---
+        let matchSpecs = "";
+        let targetGender = gender === 'male' ? "여성" : "남성";
+        let matchEmoji = gender === 'male' ? "👩‍💼" : "👨‍💼";
+        
+        // 사용자가 15% 이내(사자/치타)인 경우 -> 최상급 스펙 추천
+        if (finalRank <= 15) {
+            if (gender === 'male') {
+                matchSpecs = `<strong>[상위 10% 암사자 스펙]</strong><br>
+                - 나이: 20대 후반 ~ 30대 초반<br>
+                - 직업: 대기업, 교사, 금융권 공기업<br>
+                - 체형: 키 163cm 이상, 필라테스로 다져진 마름/탄탄<br>
+                - 자산: 본인 모은 돈 1억+ (또는 부모님 지원 가능)<br>
+                - 특징: 당신의 스펙에 걸맞은 완벽한 내/외조가 가능한 트로피 배우자.`;
+                matchEmoji = "👸";
+            } else {
+                matchSpecs = `<strong>[상위 10% 수사자 스펙]</strong><br>
+                - 나이: 30대 초/중반<br>
+                - 직업: 의사/치과의사, 10대 대기업 책임급, 사업가<br>
+                - 체형: 키 178cm 이상, 넓은 어깨와 깔끔한 인상<br>
+                - 자산: 순자산 5억 이상 (강남/송파 자가 보유 또는 전세 가능)<br>
+                - 특징: 경제적 자유와 듬직함을 동시에 주는 알파메일.`;
+                matchEmoji = "🤴";
+            }
+        } 
+        // 중간 계층 (기린/얼룩말)
+        else if (finalRank <= 70) {
+            if (gender === 'male') {
+                matchSpecs = `<strong>[현실적인 동급 얼룩말 짝꿍]</strong><br>
+                - 나이: 본인과 1~3살 차이<br>
+                - 직업: 중견/중소기업 사무직, 보육교사 등<br>
+                - 체형: 지극히 평범하고 건강한 체형<br>
+                - 특징: 함께 대출 이자를 갚으며 주말에 넷플릭스를 보는 소소한 행복을 나눌 동반자.`;
+            } else {
+                matchSpecs = `<strong>[현실적인 동급 얼룩말 짝꿍]</strong><br>
+                - 나이: 본인과 동갑 ~ 4살 연상<br>
+                - 직업: 대리/과장급 중견/중소기업 직장인<br>
+                - 체형: 살짝 배가 나왔지만 인상 좋은 평범남<br>
+                - 특징: 특별히 뛰어나진 않지만 가정을 위해 묵묵히 책임감을 다할 착한 남편.`;
+            }
+        }
+        // 하위 계층 (미어캣/쇠똥구리)
+        else {
+            matchSpecs = `<strong>[현재 매칭 풀]</strong><br>
+            - 현실적으로 결정사(사바나 중심부) 진입이 어렵습니다.<br>
+            - 스펙을 따지기보다는, 지인 소개나 동호회 등을 통해 조건 없이 나 자체를 사랑해 줄 사람을 찾는 것이 빠릅니다.`;
+            matchEmoji = "🥲";
+        }
+        
+        document.getElementById('matchEmoji').innerText = matchEmoji;
+        document.getElementById('matchSpecs').innerHTML = matchSpecs;
+    }
+</script>
+
+</body>
+</html>
