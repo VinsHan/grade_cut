@@ -8,7 +8,10 @@
         body { font-family: 'Noto Sans KR', sans-serif; background-color: #f4f7f6; color: #333; display: flex; justify-content: center; min-height: 100vh; margin: 0; padding: 20px; }
         .container { background-color: #fff; padding: 40px; border-radius: 20px; box-shadow: 0 15px 30px rgba(0,0,0,0.1); width: 100%; max-width: 650px; text-align: center; }
         h1 { color: #2e7d32; margin-bottom: 5px; font-size: 1.8em; }
-        p.subtitle { color: #666; margin-bottom: 25px; font-size: 0.9em; }
+        p.subtitle { color: #666; margin-bottom: 15px; font-size: 0.9em; }
+        
+        /* ⭐️ 추가된 개인정보 안심 알림창 스타일 */
+        .privacy-notice { background-color: #ffebee; color: #c62828; padding: 12px 15px; border-radius: 8px; font-size: 0.9em; font-weight: bold; margin-bottom: 25px; border: 1px dashed #ef9a9a; word-break: keep-all; line-height: 1.4; }
         
         .form-row { display: flex; gap: 15px; margin-bottom: 15px; }
         .form-group { flex: 1; text-align: left; }
@@ -21,7 +24,6 @@
         
         #resultArea { display: none; margin-top: 30px; animation: fadeIn 0.5s ease-in-out; }
         
-        /* 먹이사슬 UI 업데이트 */
         .animal-box { background: #e8f5e9; border: 3px solid #a5d6a7; border-radius: 15px; padding: 25px; margin-bottom: 20px; position: relative;}
         .animal-emoji { font-size: 6em; margin: 10px 0; line-height: 1; }
         .animal-title { font-size: 2em; font-weight: bold; color: #1b5e20; margin-bottom: 5px; }
@@ -34,7 +36,6 @@
         .commentary { background-color: #fffde7; padding: 25px; border-radius: 12px; border: 2px solid #ffd54f; text-align: left; font-size: 1em; line-height: 1.8; margin-bottom: 20px; color: #3e2723; }
         .commentary h3 { margin-top: 0; color: #f57f17; border-bottom: 1px solid #ffe082; padding-bottom: 10px; font-size: 1.2em; display: flex; align-items: center; gap: 8px; }
         
-        /* 추천 이성 프로필 */
         .match-profile { border: 2px dashed #2e7d32; padding: 20px; border-radius: 15px; background-color: #f1f8e9; text-align: left; position: relative; }
         .match-profile h3 { color: #1b5e20; margin-top: 0; padding-bottom: 10px; border-bottom: 1px solid #c5e1a5; }
         .match-profile .match-emoji { font-size: 2.5em; position: absolute; right: 20px; top: 15px; }
@@ -49,6 +50,11 @@
     <h1>🦓 사바나 결정사: 연애 계급 판독기</h1>
     <p class="subtitle">상위 1% 사자부터 하위 100% 기생충까지, 당신의 족보를 까드립니다.</p>
     
+    <div class="privacy-notice">
+        🚨 안심하세요! 입력하신 모든 정보는 서버에 저장되거나 수집되지 않습니다.<br>
+        오직 본인의 기기(브라우저)에서만 계산용으로 사용되며, 페이지를 끄면 즉시 증발합니다.
+    </div>
+
     <div id="formArea">
         <div class="form-group" style="margin-bottom: 15px;">
             <label>1. 성별</label>
@@ -130,58 +136,109 @@
 </div>
 
 <script>
-    // ⭐️ 2% 단위로 세분화된 50단계 동물/곤충 도감 데이터
+    // ⭐️ 50단계 동물 도감 + 맞춤형 관찰일지(obsLog) 50종 세트 추가
     const savannaDoGam = [
-        { pct: 2, name: "수사자/암사자", emoji: "🦁", tier: "황제", desc: "생태계 지배자. 존재 자체가 스펙." },
-        { pct: 4, name: "호랑이", emoji: "🐯", tier: "포식자", desc: "고독하고 럭셔리한 사냥꾼." },
-        { pct: 6, name: "재규어", emoji: "🐆", tier: "포식자", desc: "은밀하고 완벽한 능력자." },
-        { pct: 8, name: "치타", emoji: "🐆", tier: "포식자", desc: "압도적인 속도의 인기남/녀." },
-        { pct: 10, name: "코끼리", emoji: "🐘", tier: "포식자", desc: "성숙하고 묵직한 부의 상징." },
-        { pct: 12, name: "하마", emoji: "🦛", tier: "포식자", desc: "건드리면 아주 위험한 자산가." },
-        { pct: 14, name: "긴팔원숭이", emoji: "🐒", tier: "인기종", desc: "재치와 능력을 겸비한 매력쟁이." },
-        { pct: 16, name: "기린", emoji: "🦒", tier: "상위권", desc: "눈높이가 대기권을 뚫어버린 상위 티어." },
-        { pct: 18, name: "고릴라", emoji: "🦍", tier: "상위권", desc: "든든하고 피지컬 좋은 우량주." },
-        { pct: 20, name: "얼룩말", emoji: "🦓", tier: "평범", desc: "패션 센스 좋은 건실한 직장인." },
-        { pct: 22, name: "야생마", emoji: "🐎", tier: "평범", desc: "에너지가 넘치는 유망주." },
-        { pct: 24, name: "가젤", emoji: "🦌", tier: "평범", desc: "날렵하고 세련된 초식동물." },
-        { pct: 26, name: "여우", emoji: "🦊", tier: "평범", desc: "눈치 빠르고 매력적인 능력자." },
-        { pct: 28, name: "늑대", emoji: "🐺", tier: "평범", desc: "한 사람만 바라보는 순정파." },
-        { pct: 30, name: "수리부엉이", emoji: "🦉", tier: "평범", desc: "지적이고 냉철한 고학력자." },
-        { pct: 32, name: "독수리", emoji: "🦅", tier: "평범", desc: "위에서 아래를 내려다보는 자존심." },
-        { pct: 34, name: "타조", emoji: "🦩", tier: "평범", desc: "잘 달리지만 가끔 현실 도피를 함." },
-        { pct: 36, name: "너구리", emoji: "🦝", tier: "평범", desc: "능글맞게 본인 실속은 잘 챙김." },
-        { pct: 38, name: "오소리", emoji: "🦡", tier: "평범", desc: "깡다구 하나는 끝내주는 성격." },
-        { pct: 40, name: "맷돼지", emoji: "🐗", tier: "평범", desc: "눈치 안 보고 돌진하는 불도저." },
-        { pct: 42, name: "물소", emoji: "🐃", tier: "하위권", desc: "평범하고 성실하기만한 가장 스타일." },
-        { pct: 44, name: "판다", emoji: "🐼", tier: "하위권", desc: "귀엽지만 게을러서 남이 먹여줘야 함." },
-        { pct: 46, name: "캥거루", emoji: "🦘", tier: "하위권", desc: "나이 먹고도 부모 주머니에 얹혀삶." },
-        { pct: 48, name: "코알라", emoji: "🐨", tier: "하위권", desc: "하루 종일 잠만 자고 무기력함." },
-        { pct: 50, name: "원숭이", emoji: "🐵", tier: "하위권", desc: "잔재주는 많으나 진중함이 없음." },
-        { pct: 52, name: "나무늘보", emoji: "🦥", tier: "하위권", desc: "너무 답답해서 만나는 사람 사리 나옴." },
-        { pct: 54, name: "하이에나", emoji: "🐺", tier: "하위권", desc: "남이 먹다 남은 매물(?)만 노림." },
-        { pct: 56, name: "미어캣", emoji: "🦦", tier: "하위권", desc: "늘 불안에 떨며 이리저리 눈치만 봄." },
-        { pct: 58, name: "고슴도치", emoji: "🦔", tier: "하위권", desc: "까칠해서 성격파탄자 소리를 자주 들음." },
-        { pct: 60, name: "두더지", emoji: "🦯", tier: "하위권", desc: "세상 물정 모르고 방구석에만 박혀있음." },
-        { pct: 62, name: "다람쥐", emoji: "🐿️", tier: "하위권", desc: "도토리(월급) 모으느라 연애할 여유 없음." },
-        { pct: 64, name: "토끼", emoji: "🐇", tier: "하위권", desc: "겁 많고 약해서 포식자들의 호구 1순위." },
-        { pct: 66, name: "쥐", emoji: "🐭", tier: "하위권", desc: "여기저기 기웃거리지만 실속이 없음." },
-        { pct: 68, name: "닭", emoji: "🐔", tier: "하위권", desc: "단순함의 극치. 3초 뒤에 까먹는 지능." },
-        { pct: 70, name: "개구리", emoji: "🐸", tier: "하위권", desc: "우물 안 개구리. 본인 주제도 모르고 허세만 가득함." },
-        { pct: 72, name: "전갈", emoji: "🦂", tier: "곤충", desc: "치명적인 독설로 상대 가슴에 대못을 박음." },
-        { pct: 74, name: "거미", emoji: "🕷️", tier: "곤충", desc: "음침하게 방구석에 덫 놓고 사람을 기다림." },
-        { pct: 76, name: "말벌", emoji: "🐝", tier: "곤충", desc: "공격성만 가득 찬 분노조절장애." },
-        { pct: 78, name: "일벌", emoji: "🐝", tier: "곤충", desc: "평생 매력 없이 일만 하다 짝 못 찾고 늙어감." },
-        { pct: 80, name: "사마귀", emoji: "🦗", tier: "곤충", desc: "결혼하면 배우자 등골 빼먹을 관상." },
-        { pct: 82, name: "귀뚜라미", emoji: "🦗", tier: "곤충", desc: "매일 밤마다 본인 신세 한탄만 시끄럽게 함." },
-        { pct: 84, name: "매미", emoji: "🪰", tier: "곤충", desc: "한 철 반짝 꾸미고 나오지만 사실 속은 텅 빔." },
-        { pct: 86, name: "파리", emoji: "🪰", tier: "곤충", desc: "거절당해도 눈치 없이 계속 귀찮게 들이댐." },
-        { pct: 88, name: "모기", emoji: "🦟", tier: "곤충", desc: "상대방의 피(돈과 멘탈)를 쪽쪽 빨아먹음." },
-        { pct: 90, name: "바퀴벌레", emoji: "🪳", tier: "해충", desc: "생명력만 끈질기고 그 누구에게도 환영받지 못함." },
-        { pct: 92, name: "지렁이", emoji: "🪱", tier: "환형동물", desc: "밟혀도 꿈틀거리는 게 유일하게 내세울 점." },
-        { pct: 94, name: "달팽이", emoji: "🐌", tier: "연체동물", desc: "내 집 마련의 꿈을 등에 무겁게 이고 평생 기어 다님." },
-        { pct: 96, name: "나방", emoji: "🦋", tier: "해충", desc: "화려한 불빛(허세와 사치)만 쫓다가 장렬히 산화함." },
-        { pct: 98, name: "쇠똥구리", emoji: "🪲", tier: "해충", desc: "남들이 쳐다보지도 않는 현실의 똥만 평생 굴려야 함." },
-        { pct: 100, name: "연가시 (기생충)", emoji: "🦠", tier: "미생물", desc: "숙주(돈 많은 배우자) 없이는 단 하루도 자립할 수 없는 최악의 상태." }
+        { pct: 2, name: "수사자/암사자", emoji: "🦁", tier: "황제", desc: "생태계 지배자. 존재 자체가 스펙.",
+          obsLog: "생태계의 절대자입니다. 굳이 짝짓기에 목숨 걸며 뛰어다니지 않아도 수많은 초식동물들이 제 발로 찾아와 헌신을 맹세합니다. 거만하게 굴어도 합법인 유일한 티어입니다." },
+        { pct: 4, name: "호랑이", emoji: "🐯", tier: "포식자", desc: "고독하고 럭셔리한 사냥꾼.",
+          obsLog: "압도적인 매력과 스펙을 갖춘 고독한 지배자입니다. 무리 지어 다니지 않아도 존재감이 폭발하며, 본인이 원할 때만 골라서 사냥에 나서는 여유를 부립니다." },
+        { pct: 6, name: "재규어", emoji: "🐆", tier: "포식자", desc: "은밀하고 완벽한 능력자.",
+          obsLog: "은밀하고 치명적입니다. 겉보기엔 요란하지 않지만 알고 보면 엄청난 자산과 능력을 숨기고 있는 알짜배기 포식자로, 상위권 매니아층의 열광적인 지지를 받습니다." },
+        { pct: 8, name: "치타", emoji: "🐆", tier: "포식자", desc: "압도적인 속도의 인기남/녀.",
+          obsLog: "트렌드에 민감하고 외모가 화려해 연애 시장에서 단기 수요가 가장 폭발하는 인기 종입니다. 다만 눈이 너무 높아 정착이 늦어지는 경향이 있습니다." },
+        { pct: 10, name: "코끼리", emoji: "🐘", tier: "포식자", desc: "성숙하고 묵직한 부의 상징.",
+          obsLog: "육중한 경제력과 안정감을 자랑합니다. 첫눈에 반하는 화려함은 없을지 몰라도, 결혼이라는 장기전 생태계에서는 이만한 우량주가 없어 VIP 대접을 받습니다." },
+        { pct: 12, name: "하마", emoji: "🦛", tier: "포식자", desc: "건드리면 아주 위험한 자산가.",
+          obsLog: "둥글둥글해 보이지만 빡치면 생태계 1티어인 무서운 은수저/전문직들입니다. 깐깐한 조건으로 철벽을 치며 본인 영역에 들어올 짝을 신중히 고릅니다." },
+        { pct: 14, name: "긴팔원숭이", emoji: "🐒", tier: "인기종", desc: "재치와 능력을 겸비한 매력쟁이.",
+          obsLog: "타고난 센스와 유머 감각, 준수한 스펙으로 어딜 가나 이성들의 시선을 사로잡습니다. 발이 너무 넓어 여기저기 어장관리를 한다는 오해를 자주 받습니다." },
+        { pct: 16, name: "기린", emoji: "🦒", tier: "상위권", desc: "눈높이가 대기권을 뚫어버린 상위 티어.",
+          obsLog: "스펙은 좋지만, 짝을 고르는 눈높이가 성층권을 뚫고 우주로 가버린 탓에 매번 매칭에 실패합니다. 완벽한 유니콘을 찾느라 자발적 독수공방 중입니다." },
+        { pct: 18, name: "고릴라", emoji: "🦍", tier: "상위권", desc: "든든하고 피지컬 좋은 우량주.",
+          obsLog: "듬직한 피지컬과 우직한 성실함으로 승부하는 타입입니다. 화려한 외모는 덜해도 알아갈수록 진국이라 일등 신랑/신붓감으로 꼽힙니다." },
+        { pct: 20, name: "얼룩말", emoji: "🦓", tier: "평범", desc: "패션 센스 좋은 건실한 직장인.",
+          obsLog: "지극히 평범하고 건강한 대한민국 평균의 결정체입니다. 길거리에서 가장 흔히 보이는 타입으로, 비슷한 얼룩말들과 뭉쳐 대출 이자를 갚으며 살아갑니다." },
+        { pct: 22, name: "야생마", emoji: "🐎", tier: "평범", desc: "에너지가 넘치는 유망주.",
+          obsLog: "아직 완벽히 다듬어지진 않았지만 무한한 잠재력과 에너지를 가진 젊은 피입니다. 지금의 열정을 알아봐 줄 든든한 투자자(배우자)를 애타게 찾고 있습니다." },
+        { pct: 24, name: "가젤", emoji: "🦌", tier: "평범", desc: "날렵하고 세련된 초식동물.",
+          obsLog: "세련된 외모로 포식자들의 타겟 1순위가 되는 매력적인 초식동물입니다. 연애는 쉽게 시작하지만 안정적인 결혼 안착은 오히려 어려움을 겪곤 합니다." },
+        { pct: 26, name: "여우", emoji: "🦊", tier: "평범", desc: "눈치 빠르고 매력적인 능력자.",
+          obsLog: "본인의 매력 포인트를 정확히 알고 밀당의 고수 짓을 하는 영악한 개체입니다. 스펙 대비 훨씬 높은 티어의 포식자를 물어가는 기적을 종종 보여줍니다." },
+        { pct: 28, name: "늑대", emoji: "🐺", tier: "평범", desc: "한 사람만 바라보는 순정파.",
+          obsLog: "한 번 짝을 맺으면 평생 헌신하는 로맨티스트입니다. 하지만 그 한 마리를 고르는 기준이 몹시 까다로워 막상 본인은 늦게까지 모태솔로로 지내기도 합니다." },
+        { pct: 30, name: "수리부엉이", emoji: "🦉", tier: "평범", desc: "지적이고 냉철한 고학력자.",
+          obsLog: "학력과 지성으로 무장한 뇌섹남녀입니다. 다만 지나치게 이성적이고 따지기를 좋아해 연애의 달달한 감성을 메마르게 하는 치명적인 단점이 있습니다." },
+        { pct: 32, name: "독수리", emoji: "🦅", tier: "평범", desc: "위에서 아래를 내려다보는 자존심.",
+          obsLog: "본인 프라이드가 하늘을 찌르는 타입입니다. 현실은 평범한데 마음만은 포식자라 상대방을 자꾸 평가하려 들다가 썸을 다 박살 내고 맙니다." },
+        { pct: 34, name: "타조", emoji: "🦩", tier: "평범", desc: "잘 달리지만 가끔 현실 도피를 함.",
+          obsLog: "충분히 연애할 능력이 되면서도 불리한 상황이 오면 대가리를 땅에 박고 회피합니다. 결혼의 책임감을 두려워하는 회피형 애착일 확률이 몹시 높습니다." },
+        { pct: 36, name: "너구리", emoji: "🦝", tier: "평범", desc: "능글맞게 본인 실속은 잘 챙김.",
+          obsLog: "친화력이 좋고 둥글둥글해 남녀노소 잘 어울리지만, 연애 시장에서는 치명적인 이성적 매력이 부족해 늘 '좋은 오빠/동생'으로 전락하는 안타까운 녀석입니다." },
+        { pct: 38, name: "오소리", emoji: "🦡", tier: "평범", desc: "깡다구 하나는 끝내주는 성격.",
+          obsLog: "스펙은 평범하지만 근자감과 깡다구 하나로 밀어붙이는 돌격대장입니다. 가끔 선을 넘는 급발진으로 상대방을 도망가게 만드니 완급 조절이 시급합니다." },
+        { pct: 40, name: "맷돼지", emoji: "🐗", tier: "평범", desc: "눈치 안 보고 돌진하는 불도저.",
+          obsLog: "분위기 파악을 밥 말아 먹고 저돌적으로 들이대기만 하는 타입입니다. '열 번 찍어 안 넘어가는 나무 없다'는 쌍팔년도 마인드를 가졌다면 당장 갖다 버리십시오." },
+        { pct: 42, name: "물소", emoji: "🐃", tier: "하위권", desc: "평범하고 성실하기만한 가장 스타일.",
+          obsLog: "묵묵히 밭만 가는 소처럼, 이성적인 매력보다는 '성실함' 원툴로 승부합니다. 연애하는 재미는 지독하게 없지만 굶겨 죽이진 않을 생계형 짝꿍입니다." },
+        { pct: 44, name: "판다", emoji: "🐼", tier: "하위권", desc: "귀엽지만 게을러서 남이 먹여줘야 함.",
+          obsLog: "가만히 있어도 우쭈쭈는 받지만, 연애조차 남이 떠먹여 주길 바라는 극도로 수동적인 개체입니다. 도태되기 전에 본인이 먼저 좀 씻고 밖으로 나가십시오." },
+        { pct: 46, name: "캥거루", emoji: "🦘", tier: "하위권", desc: "나이 먹고도 부모 주머니에 얹혀삶.",
+          obsLog: "나이가 찼음에도 부모님의 그늘(자본, 의사결정)에서 벗어나지 못한 마마보이/걸입니다. 이 개체와 엮이면 시댁/처가와 평생 피 말리는 기싸움을 해야 합니다." },
+        { pct: 48, name: "코알라", emoji: "🐨", tier: "하위권", desc: "하루 종일 잠만 자고 무기력함.",
+          obsLog: "에너지 레벨이 지하를 뚫고 들어갑니다. 주말에 데이트 나가기도 귀찮아하고 침대와 한 몸이 되어 살아가니 연애 세포가 말라비틀어져 죽어가는 중입니다." },
+        { pct: 50, name: "원숭이", emoji: "🐵", tier: "하위권", desc: "잔재주는 많으나 진중함이 없음.",
+          obsLog: "술자리에서는 광대 역할을 톡톡히 하지만, 막상 진지한 1:1 관계에서는 신뢰감을 주지 못해 늘 '친구 이상 연인 이하'에 머무는 가벼운 종족입니다." },
+        { pct: 52, name: "나무늘보", emoji: "🦥", tier: "하위권", desc: "너무 답답해서 만나는 사람 사리 나옴.",
+          obsLog: "카톡 답장도 느리고, 결단력도 느리고, 스킨십 진도도 느립니다. 이 개체와 썸을 타는 이성은 답답함에 화병이 나서 다른 포식자에게 환승해 버립니다." },
+        { pct: 54, name: "하이에나", emoji: "🐺", tier: "하위권", desc: "남이 먹다 남은 매물(?)만 노림.",
+          obsLog: "정상적인 짝짓기 시장(소개팅/선)에서 경쟁할 능력이 없어, 남들이 썸 타다 깨진 틈이나 만취한 틈 등 얍삽한 기회만 노리는 눈물겨운 생존 전략을 구사합니다." },
+        { pct: 56, name: "미어캣", emoji: "🦦", tier: "하위권", desc: "늘 불안에 떨며 이리저리 눈치만 봄.",
+          obsLog: "본인의 주관 없이 늘 남들의 연애를 염탐하고 비교하느라 정신이 없습니다. 인스타 속 남들의 화려한 삶을 쫓다가 정작 본인 곁의 사람을 지치게 만듭니다." },
+        { pct: 58, name: "고슴도치", emoji: "🦔", tier: "하위권", desc: "까칠해서 성격파탄자 소리를 자주 들음.",
+          obsLog: "상대방이 호감을 표하면 상처받기 싫어서 가시부터 바짝 세우는 방어기제 덩어리입니다. 본인 성격 더러운 걸 '밀당'이라고 착각하고 있다면 심각한 문제입니다." },
+        { pct: 60, name: "두더지", emoji: "🦯", tier: "하위권", desc: "세상 물정 모르고 방구석에만 박혀있음.",
+          obsLog: "햇빛(사교 모임)을 피해 방구석에만 박혀 2D 캐릭터나 모니터 속 아이돌에게만 맹목적인 애정을 쏟는 개체입니다. 현실로 나오지 않으면 영원히 모태솔로입니다." },
+        { pct: 62, name: "다람쥐", emoji: "🐿️", tier: "하위권", desc: "도토리(월급) 모으느라 연애할 여유 없음.",
+          obsLog: "미래를 대비한답시고 돈 모으는 데만 혈안이 되어, 썸남썸녀에게 커피 한 잔 사는 것도 아까워 손을 떠는 궁상의 극치를 달립니다. 평생 돈만 끌어안고 사십시오." },
+        { pct: 64, name: "토끼", emoji: "🐇", tier: "하위권", desc: "겁 많고 약해서 포식자들의 호구 1순위.",
+          obsLog: "외로움을 너무 많이 타고 귀가 얇아, 밤늦게 아무나 찔러보는 불건전한 포식자들에게 아주 쉬운 먹잇감(호구)으로 전락하기 십상인 위태로운 개체입니다." },
+        { pct: 66, name: "쥐", emoji: "🐭", tier: "하위권", desc: "여기저기 기웃거리지만 실속이 없음.",
+          obsLog: "남의 눈을 피해 데이팅 앱이나 오픈채팅 등 음침한 만남만 추구합니다. 양지로 나와 지인 소개를 받을 수 없을 만큼 스펙이나 인성에 하자가 있을 확률이 높습니다." },
+        { pct: 68, name: "닭", emoji: "🐔", tier: "하위권", desc: "단순함의 극치. 3초 뒤에 까먹는 지능.",
+          obsLog: "똑같은 똥차 연애 패턴과 똑같은 이별 실수를 무한 반복하는 조류 수준의 학습 능력을 가졌습니다. 왜 항상 본인만 나쁜 이성을 만나는지 반성부터 하십시오." },
+        { pct: 70, name: "개구리", emoji: "🐸", tier: "하위권", desc: "우물 안 개구리. 본인 주제도 모르고 허세만 가득함.",
+          obsLog: "본인 주제파악은 못 하고 눈만 우주 높은 줄 모르고 뛰어오르는 헛바람 든 개체입니다. 제발 그 좁은 우물 안에서 나오지 말고 혼자 늙어가는 것이 세상에 이롭습니다." },
+        // 🐛 하위 30% 곤충/미생물 (더 매워짐)
+        { pct: 72, name: "전갈", emoji: "🦂", tier: "곤충", desc: "치명적인 독설로 상대 가슴에 대못을 박음.",
+          obsLog: "애인에게 따뜻한 말 한마디 건네지 못하고, 매번 가시 돋친 독설로 상대방의 자존감을 가루로 만들어버리는 정서적 학대의 주범입니다. 제발 연애하지 마십시오." },
+        { pct: 74, name: "거미", emoji: "🕷️", tier: "곤충", desc: "음침하게 방구석에 덫 놓고 사람을 기다림.",
+          obsLog: "집착과 소유욕의 끝판왕입니다. 상대방의 핸드폰과 일거수일투족을 감시하며 숨 막히는 거미줄로 옭아매려 드는, 경찰 신고가 시급한 피곤한 스타일입니다." },
+        { pct: 76, name: "말벌", emoji: "🐝", tier: "곤충", desc: "공격성만 가득 찬 분노조절장애.",
+          obsLog: "별것도 아닌 농담이나 상황에 툭하면 급발진하며 쏘아붙이는 분노조절장애 곤충입니다. 이 개체와 데이트를 하는 것은 언제 터질지 모르는 지뢰밭을 걷는 것과 같습니다." },
+        { pct: 78, name: "일벌", emoji: "🐝", tier: "곤충", desc: "평생 매력 없이 일만 하다 짝 못 찾고 늙어감.",
+          obsLog: "가진 거라곤 노동력밖에 없습니다. 회사에 영혼을 갈아 넣느라 본인을 가꿀 시간, 이성을 만날 시간도 없이 야근만 하다가 짝도 없이 늙어 죽어가는 짠한 노예입니다." },
+        { pct: 80, name: "사마귀", emoji: "🦗", tier: "곤충", desc: "결혼하면 배우자 등골 빼먹을 관상.",
+          obsLog: "철저히 이기적인 조건만 보고 접근하여, 상대방의 경제력과 감정을 다 빨아먹은 뒤 쓸모가 없어지면 가차 없이 머리를 뜯어먹고 버릴 무시무시한 기생 관상입니다." },
+        { pct: 82, name: "귀뚜라미", emoji: "🦗", tier: "곤충", desc: "매일 밤마다 본인 신세 한탄만 시끄럽게 함.",
+          obsLog: "만날 때마다 본인의 우울한 과거나 남 탓, 직장 불만만 늘어놓는 인간 감정 쓰레기통 취급 전문입니다. 이 개체와 1시간만 대화해도 기가 빨려 쓰러집니다." },
+        { pct: 84, name: "매미", emoji: "🪰", tier: "곤충", desc: "한 철 반짝 꾸미고 나오지만 사실 속은 텅 빔.",
+          obsLog: "인스타 프사에는 온갖 명품과 오마카세로 요란하게 허세를 부리지만, 실상은 마이너스 통장 리볼빙에 허덕이는 속 빈 강정입니다. 한 달만 사귀어봐도 밑천이 드러납니다." },
+        { pct: 86, name: "파리", emoji: "🪰", tier: "곤충", desc: "거절당해도 눈치 없이 계속 귀찮게 들이댐.",
+          obsLog: "상대방이 카톡 읽씹으로 명확히 거절의 의사를 표했음에도, 눈치 없이 '뭐해?'라며 끈질기게 앵앵거리는 예비 스토커 곤충입니다. 당장 차단이 시급합니다." },
+        { pct: 88, name: "모기", emoji: "🦟", tier: "곤충", desc: "상대방의 피(돈과 멘탈)를 쪽쪽 빨아먹음.",
+          obsLog: "데이트할 때 본인 지갑은 지퍼를 채워놨는지 절대 열지 않으며, 온갖 불쌍한 핑계로 상대방에게 기생해 데이트 비용(피)을 쪽쪽 빨아먹고 사는 얌체 중의 얌체입니다." },
+        { pct: 90, name: "바퀴벌레", emoji: "🪳", tier: "해충", desc: "생명력만 끈질기고 그 누구에게도 환영받지 못함.",
+          obsLog: "자본주의 생태계에서 어떻게든 살아남는 질긴 생명력은 인정하지만, 연애 시장에 등장하는 순간 주변 이성들을 비명 지르며 도망가게 만드는 기피 대상 1호입니다." },
+        { pct: 92, name: "지렁이", emoji: "🪱", tier: "환형동물", desc: "밟혀도 꿈틀거리는 게 유일하게 내세울 점.",
+          obsLog: "자존감이 지구 내핵까지 뚫고 들어갔습니다. '나 같은 게 그렇지 뭐'라는 끝없는 패배의식에 찌들어 있어, 옆에 있는 멀쩡한 사람까지 우울증에 걸리게 만듭니다." },
+        { pct: 94, name: "달팽이", emoji: "🐌", tier: "연체동물", desc: "내 집 마련의 꿈을 등에 무겁게 이고 평생 기어 다님.",
+          obsLog: "결혼의 필수 조건인 '부동산'에 병적으로 집착하여, 이제 막 썸 타기 시작했는데 자녀 학군과 주담대 금리부터 논하며 상대방의 숨을 턱 막히게 만듭니다." },
+        { pct: 96, name: "나방", emoji: "🦋", tier: "해충", desc: "화려한 불빛(허세와 사치)만 쫓다가 장렬히 산화함.",
+          obsLog: "자신의 텅 빈 지갑 사정도 모르고 그저 반짝이는 화려한 외모의 이성(불빛)이나 명품만 쫓아다니다가, 매번 사기를 당하거나 빚더미에 앉아 타죽고 마는 인생입니다." },
+        { pct: 98, name: "쇠똥구리", emoji: "🪲", tier: "해충", desc: "남들이 쳐다보지도 않는 현실의 똥만 평생 굴려야 함.",
+          obsLog: "비참할 정도로 척박한 스펙(현실) 속에서 그저 눈앞에 놓인 대출금과 빚(똥)을 굴리며 버티는 눈물겨운 삶입니다. 로맨스는 당신 인생에 사치일 뿐입니다." },
+        { pct: 100, name: "연가시", emoji: "🦠", tier: "미생물", desc: "숙주(돈 많은 배우자) 없이는 단 하루도 자립할 수 없는 최악의 상태.",
+          obsLog: "자립심, 경제력, 자존감 모든 것이 0에 수렴합니다. 본인을 먹여 살려주고 설거지까지 다 해줄 '돈 많은 호구 숙주'를 찾지 못하면 굶어 죽고 마는 생태계 최악의 기생충입니다." }
     ];
 
     function calculateRank() {
@@ -198,7 +255,6 @@
         if(!age || !height || !weight || !income || !looks) { alert("빈칸 없이 모든 정보를 꽉 채워야 초원에 입장할 수 있습니다."); return; }
         if(looks < 1 || looks > 10) { alert("외모 점수는 1점에서 10점 사이로 입력해주세요."); return; }
 
-        // BMI 계산
         const bmi = weight / ((height/100) * (height/100));
         let bmiPct = 50;
         if (gender === 'male') {
@@ -213,38 +269,33 @@
             else bmiPct = 95;
         }
 
-        // ⭐️ 나이 계산 초정밀 세분화 (1~2살 단위로 티어 변경)
         let agePct = 50;
         if (gender === 'male') {
-            if(age < 26) agePct = 80;      // 25세 이하: 대학생/군인 (결혼시장 진입 불가)
-            else if(age <= 27) agePct = 60; // 26~27: 사회초년생 핏덩이
-            else if(age <= 29) agePct = 20; // 28~29: 준비된 신인 (수요 급증)
-            else if(age <= 32) agePct = 1;  // 30~32: 압도적 1군 황금기 만점
-            else if(age <= 34) agePct = 10; // 33~34: 최전성기 살짝 지남 (여전히 좋음)
-            else if(age <= 36) agePct = 30; // 35~36: 적령기 마지노선 진입
-            else if(age <= 38) agePct = 60; // 37~38: 감점 본격화 (매칭 난이도 상승)
-            else if(age <= 40) agePct = 85; // 39~40: 도태 위기 적신호
-            else agePct = 99;               // 41세 이상: 극악
+            if(age < 26) agePct = 80;      
+            else if(age <= 27) agePct = 60; 
+            else if(age <= 29) agePct = 20; 
+            else if(age <= 32) agePct = 1;  
+            else if(age <= 34) agePct = 10; 
+            else if(age <= 36) agePct = 30; 
+            else if(age <= 38) agePct = 60; 
+            else if(age <= 40) agePct = 85; 
+            else agePct = 99;               
         } else {
-            if(age < 23) agePct = 80;      // 22세 이하: 대학생 (결혼 생각 없음)
-            else if(age <= 24) agePct = 40; // 23~24: 어리지만 수요 있음
-            else if(age <= 26) agePct = 10; // 25~26: 수요 폭발 시작
-            else if(age <= 29) agePct = 1;  // 27~29: 압도적 1군 깡패 황금기 만점
-            else if(age <= 31) agePct = 15; // 30~31: 경쟁 치열해짐
-            else if(age <= 33) agePct = 35; // 32~33: 커트라인 돌입
-            else if(age <= 35) agePct = 65; // 34~35: 감점 본격화 (매칭 난이도 훅 뜀)
-            else if(age <= 37) agePct = 85; // 36~37: 매칭 풀 급감 적신호
-            else agePct = 99;               // 38세 이상: 극악
+            if(age < 23) agePct = 80;      
+            else if(age <= 24) agePct = 40; 
+            else if(age <= 26) agePct = 10; 
+            else if(age <= 29) agePct = 1;  
+            else if(age <= 31) agePct = 15; 
+            else if(age <= 33) agePct = 35; 
+            else if(age <= 35) agePct = 65; 
+            else if(age <= 37) agePct = 85; 
+            else agePct = 99;               
         }
 
-        // 경제력 계산
         let incomePct = gender === 'male' ? Math.max(1, 100 - (income/80)) : Math.max(1, 100 - (income/50));
         let assetsPct = Math.max(1, 100 - (assets/200));
-
-        // 외모 점수 변환
         let looksPct = Math.max(1, Math.min(99, 100 - (looks * 10) + 5));
 
-        // ⚖️ 종합 백분위 도출
         let totalPct = 0;
         if(gender === 'male') {
             totalPct = (jobPct * 0.20) + (incomePct * 0.15) + (assetsPct * 0.15) + (agePct * 0.15) + (looksPct * 0.15) + (bmiPct * 0.10) + (eduPct * 0.10);
@@ -256,7 +307,6 @@
         document.getElementById('formArea').style.display = 'none';
         document.getElementById('resultArea').style.display = 'block';
 
-        // --- 50단계 동물 도감 매칭 로직 ---
         let myAnimal = savannaDoGam.find(d => finalRank <= d.pct) || savannaDoGam[savannaDoGam.length - 1];
 
         document.getElementById('animalTitle').innerText = myAnimal.name;
@@ -272,43 +322,41 @@
             <div class="stat-item">💰 <strong>연봉:</strong> 상위 ${incomePct.toFixed(0)}% 구간</div>
         `;
 
-        // 🎙️ 치명적 단점 분석
+        // 🎙️ 맞춤형 팩폭 2단 콤보 (종족 특성 + 개인 스탯 최악의 단점)
         let worstStat = Math.max(agePct, bmiPct, jobPct, incomePct, looksPct);
-        let commentHtml = `<h3>🎙️ 동물의 왕국 심층 관찰 일지</h3>`;
+        let commentHtml = `<h3>🎙️ 동물의 왕국 심층 관찰 일지: ${myAnimal.name} 편</h3>`;
         
+        // 1단 콤보: 동물별 고유 팩폭
+        commentHtml += `<p><strong>[종족 생존 특성]</strong><br>${myAnimal.obsLog}</p>`;
+        commentHtml += `<hr style="border:0; border-top:1px dashed #ffd54f; margin: 15px 0;">`;
+        
+        // 2단 콤보: 스탯 기반 약점 팩폭
+        commentHtml += `<p><strong>[🚨 AI가 포착한 치명적 생존 위협]</strong></p>`;
         if (worstStat > 70) {
             if (worstStat === looksPct) {
-                commentHtml += `<p>자연의 섭리는 잔인합니다. 카메라에 포착된 이 개체는 유전적 매력도(얼굴)에서 심각한 결함을 보이고 있습니다. 슬프게도 소개팅 생태계에서는 '성격 좋은 내면'을 어필하기도 전에 '외면'에서 1차 서류 탈락을 당합니다.</p>
-                <p>무리에서 도태되지 않으려면 자기 객관화가 시급합니다. 거울을 보고 뼈를 깎는 노력을 기울이지 않는다면, 이번 생의 짝짓기 난이도는 '지옥(Hell)' 모드를 면치 못할 것입니다.</p>`;
+                commentHtml += `<p>유전적 매력도(본판)에서 심각한 결함을 보이고 있습니다. 슬프게도 소개팅 생태계에서는 '성격 좋은 내면'을 어필하기도 전에 '얼굴'에서 1차 서류 탈락을 당합니다. 패션과 헤어스타일, 피부과 등 거울을 보고 뼈를 깎는 개조를 거치지 않으면 도태될 것입니다.</p>`;
             } 
             else if (worstStat === agePct) {
                 if ((gender === 'male' && age < 28) || (gender === 'female' && age < 25)) {
-                    commentHtml += `<p>결혼 생태계(결정사)에 뛰어들기엔 말 그대로 '핏덩이' 수준입니다. 아직 독립적인 사냥(안정적 경제력) 준비도 안 된 상태로 어른들의 잔혹한 짝짓기 시장에 기웃거리지 마십시오.</p>
-                    <p>지금은 소개팅 어플을 켤 때가 아니라, 자기계발을 하고 종잣돈을 모아야 할 시기입니다. 섣불리 사바나 중심부에 나갔다가는 뼈도 못 추릴 것입니다.</p>`;
+                    commentHtml += `<p>결혼 생태계(결정사)에 뛰어들기엔 말 그대로 '핏덩이' 수준입니다. 아직 독립적인 사냥(경제력) 준비도 안 된 상태로 잔혹한 짝짓기 시장에 기웃거리지 마십시오. 지금은 소개팅 어플을 켤 때가 아니라 자격증 책을 펴고 종잣돈을 모아야 할 시기입니다.</p>`;
                 } else {
-                    commentHtml += `<p>사바나의 시계는 무정하게 흘러갑니다. 이 개체는 생물학적 전성기를 완전히 지나 늙어가는 개체로 분류되고 있으며, 1~2살 차이로 치고 올라오는 파릇파릇한 젊은 경쟁자들에게 짓밟히고 있습니다.</p>
-                    <p>이제 남은 전략은 눈높이를 지하 암반수 수준으로 대폭 낮추거나, '압도적인 재력'으로 어린 개체를 유혹하는 것뿐입니다. 그마저도 없다면 반려식물을 키우며 마음의 평화를 찾는 것이 낫습니다.</p>`;
+                    commentHtml += `<p>생물학적 전성기를 완전히 지나 늙어가는 개체로, 파릇파릇한 젊은 경쟁자들에게 매일 짓밟히고 있습니다. 눈높이를 지하 암반수 수준으로 대폭 낮추거나 '압도적인 재력'으로 어린 개체를 꼬시는 수밖에 없습니다. 안 되면 반려견과 함께 평화를 찾으십시오.</p>`;
                 }
             } 
             else if (worstStat === bmiPct) {
-                commentHtml += `<p>겨울잠을 준비하는 곰을 보는 듯합니다. 이 개체는 생존에 불필요한 지방을 몸에 과도하게 축적했습니다. 둔탁한 움직임과 숨 가빠하는 소리는 이성들의 호감을 박살 내는 1등 공신입니다.</p>
-                <p>당장 스마트폰에서 배달 앱을 삭제하십시오. 이대로 뱃살을 껴안고 산다면 다가오는 짝짓기 철에 철저히 소외되어 방구석에서 넷플릭스와 함께 늙어갈 확률이 99.9%입니다.</p>`;
+                commentHtml += `<p>겨울잠을 준비하는 곰처럼 생존에 불필요한 지방(뱃살)을 몸에 과도하게 축적했습니다. 둔탁한 움직임과 숨 가빠하는 소리는 이성들의 식욕과 호감을 동시에 박살 냅니다. 당장 배달 앱을 지우고 헬스장으로 뛰쳐가지 않으면 평생 혼자 넷플릭스를 보며 야식을 시켜 먹게 될 것입니다.</p>`;
             } 
             else if (worstStat === jobPct) {
-                commentHtml += `<p>둥지를 틀 튼튼한 나뭇가지조차 마련하지 못한 척박한 상태입니다. 언제 쫓겨날지 모르는 불안정한 생존 기반(직업) 탓에, 그 어떤 짝도 이 개체와 가족을 꾸리는 도박을 하고 싶어 하지 않습니다.</p>
-                <p>당장 연애 세포를 끄고 잡코리아를 켜십시오. 자본주의 사바나에서 스스로의 생존조차 책임지지 못하는 개체에게 번식의 기회란 없습니다.</p>`;
+                commentHtml += `<p>둥지를 틀 나뭇가지조차 마련하지 못한 척박한 상태입니다. 언제 쫓겨날지 모르는 불안정한 생존 기반(직업) 탓에, 그 어떤 이성도 당신과 가족을 꾸리는 미친 도박을 하고 싶어 하지 않습니다. 당장 연애 세포를 끄고 사람인과 잡코리아를 켜십시오.</p>`;
             } 
             else if (worstStat === incomePct) {
-                commentHtml += `<p>사냥 능력이 처참한 수준입니다. 하루 종일 뛰어다녀서 물어오는 먹이(연봉)가 초라하여 짝을 부양하기는커녕 본인 입에 풀칠하기도 버거워 보입니다.</p>
-                <p>돈은 곧 생명력이자 가장 강력한 페로몬입니다. "가난해도 사랑만 있으면 돼"라는 망상은 당장 접어두고 주말에 투잡이라도 뛰지 않으면 독거노인 루트 확정입니다.</p>`;
+                commentHtml += `<p>사냥 능력이 처참한 수준입니다. 하루 종일 뛰어다녀서 물어오는 먹이(연봉)가 초라하여 본인 입에 풀칠하기도 버겁습니다. 자본주의 사바나에서 돈은 가장 강력한 페로몬입니다. "가난해도 사랑만 있으면 돼"라는 망상은 접어두고 주말에 배민 커넥트라도 뛰십시오.</p>`;
             }
         } else {
-            commentHtml += `<p>놀랍게도 카메라에 포착된 이 개체는 치명적인 결함이 없습니다. 털 윤기도 적당하고, 사냥 능력도 평균 이상이며 생존 지혜도 갖췄습니다.</p>
-            <p><strong>하지만 주의하십시오.</strong> 이토록 멀쩡한 스펙을 가지고도 현재 짝이 없다면, 그것은 본인의 눈이 안드로메다에 가 있거나 통계로 잡히지 않는 '성격파탄'일 확률이 매우 높습니다. 주제 파악만 잘하면 내일이라도 짝을 찾을 수 있습니다.</p>`;
+            commentHtml += `<p>놀랍게도 이 개체는 스탯상 치명적인 하자가 없습니다. 털 윤기도 좋고 사냥 능력도 양호합니다. <strong>그런데도 짝이 없다면?</strong> 본인의 눈이 안드로메다에 가 있거나, 통계로 잡히지 않는 심각한 '성격파탄'일 확률이 99%입니다. 주제 파악만 잘하면 내일이라도 결혼합니다.</p>`;
         }
         document.getElementById('commentaryDisplay').innerHTML = commentHtml;
 
-        // --- ⭐️ 매칭 프로필 로직 ---
         let matchSpecs = "";
         let matchEmoji = "";
         let matchTitle = document.querySelector('.match-profile h3');
